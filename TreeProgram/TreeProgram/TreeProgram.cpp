@@ -1,6 +1,10 @@
 // TreeProgram.cpp : Defines the entry point for the console application.
-// Mike - The tree is mirrored across the Y axis, from the start position. Exactly. So I decided to only store one half of the tree
-//Once I'm done, I'll duplicate the left side and reverse all the elements.
+//ORIGINAL THOUGHT: The tree is mirrored across the Y axis, from the start position. Exactly. So I decided to only store one half of the tree
+//Once I'm done, I'll duplicate the left side and reverse all the elements. 
+//This would be nice, but I feel its easier to just let the natural structure of the tree deal with itself
+//We're gonna have to create two halves anyways (unless we start doing crazy things with pointers)
+
+//IMPLEMENTATION I'M GOING WITH
 //When a node creates children, it links the left and right. I call these partners
 //I know this does not count everything, but there is a good reason for that.
 //The resulting diagram looks like this, in ASCII art
@@ -39,7 +43,7 @@ public:
 	virtual int getValue() = 0;
 	virtual void setLRstring(string s) = 0;
 	virtual void setPartner(Node* p) = 0;
-
+	virtual bool isEmpty() = 0;
 };
 
 class TreeNode : Node{
@@ -56,6 +60,7 @@ public:
 	int getValue();
 	void setLRstring(string s);
 	void setPartner(Node* p);
+	bool isEmpty();
 	TreeNode();
 	~TreeNode();
 };
@@ -69,9 +74,13 @@ public:
 	int getValue();
 	void setLRstring(string s);
 	void setPartner(Node* p);
+	bool isEmpty();
 	EmptyNode();
 	~EmptyNode();
 };
+
+
+
 
 
 //TREE NODE FUNCTIONS//////////////////////////////////////////////
@@ -101,7 +110,6 @@ void TreeNode::createTree(int level) {
 		int leftVal = 0;
 		int rightVal = 0;
 
-		//Here's the calculations
 		//If a Node is a left child,
 		if (lr == "L") {
 			//its leftmost neighbor has its value (unless it is a 1, in which case it has no leftmost neighbor)
@@ -119,7 +127,7 @@ void TreeNode::createTree(int level) {
 				rightVal = value;
 		}
 
-
+		//Create the nodes
 		left = new TreeNode();
 		left->setValue(value + leftVal);
 		left->setLRstring("L");
@@ -166,18 +174,32 @@ void TreeNode::setPartner(Node* p) {
 	partner = p;
 }
 
+bool TreeNode::isEmpty() {
+	return false;
+}
+
 //output your value, then your left node's value, then your right node's value
-//uses parenthesis to symbolize a node
+//uses parenthesis to symbolize a node. Each parenthesis has one number (the node's value)
+//If the parenthesis has another set of parenthesis inside, this node has children.
+//For example, (1 (1 (1 (1) (3)) (2 (3) (4))) (1 (2 (4) (3)) (1 (3) (1)))) represents a tree with 4 levels
 void TreeNode::print() {
 	//convert the int to a string
 	ostringstream oss;
 	oss << value;
 
-	cout << "(" + oss.str() + " ";
+	cout << "(" + oss.str();
+	//account for empty nodes so we don't display extra spaces
+	if (!left->isEmpty())
+		cout << " ";
 	left->print();
+	if (!right->isEmpty())
+		cout << " ";
 	right->print();
 	cout << ")";
 }
+
+
+
 
 //EMPTY NODE FUNCTIONS/////////////////////////////////
 //Has no information, so these functions do basically nothing
@@ -217,11 +239,15 @@ int EmptyNode::getValue() {
 	return 0;
 }
 
+bool EmptyNode::isEmpty() {
+	return true;
+}
+
 //MAIN/////////////////////////////////////////////////////
 int main()
 {
 	//Take the user's input for tree levels
-	cout << "How many levels for this tree?";
+	cout << "How many levels for this tree? ";
 	int levels = 0;
 	string input;
 	cin >> input;
@@ -229,7 +255,7 @@ int main()
 
 	//Create the node (if level is 0, then we want an empty one)
 	Node* n;
-	if (levels == 0)
+	if (levels <= 0)
 		n = (Node*) new EmptyNode();
 	else 
 		n = (Node*) new TreeNode();
