@@ -36,8 +36,10 @@ public:
 	virtual void reverseTree() = 0;
 	virtual void print() = 0;
 	virtual void setValue(int val) = 0;
+	virtual int getValue() = 0;
 	virtual void setLRstring(string s) = 0;
 	virtual void setPartner(Node* p) = 0;
+
 };
 
 class TreeNode : Node{
@@ -51,6 +53,7 @@ public:
 	void reverseTree();
 	void print();
 	void setValue(int val);
+	int getValue();
 	void setLRstring(string s);
 	void setPartner(Node* p);
 	TreeNode();
@@ -63,6 +66,7 @@ public:
 	void reverseTree();
 	void print();
 	void setValue(int val);
+	int getValue();
 	void setLRstring(string s);
 	void setPartner(Node* p);
 	EmptyNode();
@@ -97,6 +101,25 @@ void TreeNode::createTree(int level) {
 		int leftVal = 0;
 		int rightVal = 0;
 
+		//Here's the calculations
+		//If a Node is a left child,
+		if (lr == "L") {
+			//its leftmost neighbor has its value (unless it is a 1, in which case it has no leftmost neighbor)
+			if (value != 1)
+				leftVal = value;
+			//its rightmost neighbor has the linked Node's value.
+			rightVal = partner->getValue();
+		}
+		//If a Node is a right child, 
+		else if (lr == "R") {
+			//its leftmost neighbor has the linked Node's value.
+			leftVal = partner->getValue();
+			//its rightmost neighbor has its value (unless it is a 1, in which case it has no rightmost neighbor)
+			if (value != 1)
+				rightVal = value;
+		}
+
+
 		left = new TreeNode();
 		left->setValue(value + leftVal);
 		left->setLRstring("L");
@@ -126,6 +149,11 @@ void TreeNode::reverseTree() {
 //mutator for value
 void TreeNode::setValue(int val) {
 	value = val;
+}
+
+//accessor for value
+int TreeNode::getValue() {
+	return value;
 }
 
 //mutator for lr
@@ -183,6 +211,10 @@ void EmptyNode::setLRstring(string s) {
 
 void EmptyNode::setPartner(Node* p) {
 	return;
+}
+
+int EmptyNode::getValue() {
+	return 0;
 }
 
 //MAIN/////////////////////////////////////////////////////
