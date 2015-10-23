@@ -77,9 +77,8 @@ void TreeNode::reverseTree() {
 void TreeNode::print() {
 	ostringstream oss;
 	oss << value;
-	cout << "" + oss.str() + " (";
+	cout << "(" + oss.str() + " ";
 	left->print();
-	cout << ") (";
 	right->print();
 	cout << ")";
 }
@@ -110,6 +109,11 @@ void EmptyNode::print() {
 
 int main()
 {
+	Node* n = (Node*) new TreeNode();
+	n->createTree(4);
+	n->print();
+	string input;
+	cin >> input;
     return 0;
 }
 
