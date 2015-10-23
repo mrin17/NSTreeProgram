@@ -3,56 +3,70 @@
 //Once I'm done, I'll duplicate the left side and reverse all the elements.
 
 #include "stdafx.h"
+#include <iostream>
+#include <sstream>
+
+using namespace std;
 
 class Node;
+class TreeNode;
 class EmptyNode;
 
 class Node {
-public: 
+public:
+	virtual void createTree(int level) = 0;
+	virtual void reverseTree() = 0;
+	virtual void print() = 0;
+};
+
+class TreeNode : Node{
+public:
 	Node* left;
 	Node* right;
 	int value;
 	void createTree(int level);
 	void reverseTree();
-	Node();
-	~Node();
+	void print();
+	TreeNode();
+	~TreeNode();
 };
 
 class EmptyNode : Node {
 public:
 	void createTree(int level);
 	void reverseTree();
+	void print();
 	EmptyNode();
 	~EmptyNode();
 };
 
 
-
-Node::Node() {
+//TREE NODE FUNCTIONS//////////////////////////////////////////////
+TreeNode::TreeNode() {
 	value = 1;
 }
 
-Node::~Node() {
+TreeNode::~TreeNode() {
 	left->~Node();
 	right->~Node();
 	delete(this);
 }
 
-void Node::createTree(int level) {
+void TreeNode::createTree(int level) {
 	if (level <= 1) {
 		left = (Node*) new EmptyNode();
 		right = (Node*) new EmptyNode();
 	}
 	else {
-		left = new Node();
+		left = new TreeNode();
 		left->createTree(level - 1);
-		right = new Node();
+		right = new TreeNode();
 		right->createTree(level - 1);
 	}
 }
 
 //Swap your left and right branches, and then have your children do the same
-void Node::reverseTree() {
+void TreeNode::reverseTree() {
 	Node* n = left;
 	left = right;
 	right = n;
@@ -60,7 +74,17 @@ void Node::reverseTree() {
 	right->reverseTree();
 }
 
+void TreeNode::print() {
+	ostringstream oss;
+	oss << value;
+	cout << "" + oss.str() + " (";
+	left->print();
+	cout << ") (";
+	right->print();
+	cout << ")";
+}
 
+//EMPTY NODE FUNCTIONS/////////////////////////////////
 EmptyNode::EmptyNode() {
 
 }
@@ -74,6 +98,10 @@ void EmptyNode::createTree(int level) {
 }
 
 void EmptyNode::reverseTree() {
+	return;
+}
+
+void EmptyNode::print() {
 	return;
 }
 
