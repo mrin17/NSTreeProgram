@@ -1,6 +1,22 @@
 // TreeProgram.cpp : Defines the entry point for the console application.
 // Mike - The tree is mirrored across the Y axis, from the start position. Exactly. So I decided to only store one half of the tree
 //Once I'm done, I'll duplicate the left side and reverse all the elements.
+//When a node creates children, it links the left and right. I call these partners
+//I know this does not count everything, but there is a good reason for that.
+//The resulting diagram looks like this, in ASCII art
+//          1
+//         / \
+//        /   \
+//       /     \
+//      /       \
+//     1---------1
+//    / \       / \
+//   1---2     2---1
+//Nodes also keep track of if they are left or right children, because this matters
+//If a Node is a left child, its leftmost neighbor has its value (unless it is a 1, in which case it has no leftmost neighbor)
+//If a Node is a left child, its rightmost neighbor has the linked Node's value.
+//If a Node is a right child, its leftmost neighbor has the linked Node's value.
+//If a Node is a right child, its rightmost neighbor has its value (unless it is a 1, in which case it has no rightmost neighbor)
 
 #include "stdafx.h"
 #include <iostream>
@@ -20,17 +36,23 @@ public:
 	virtual void reverseTree() = 0;
 	virtual void print() = 0;
 	virtual void setValue(int val) = 0;
+	virtual void setLRstring(string s) = 0;
+	virtual void setPartner(Node* p) = 0;
 };
 
 class TreeNode : Node{
 public:
 	Node* left;
 	Node* right;
+	Node* partner;
 	int value;
+	string lr;
 	void createTree(int level);
 	void reverseTree();
 	void print();
 	void setValue(int val);
+	void setLRstring(string s);
+	void setPartner(Node* p);
 	TreeNode();
 	~TreeNode();
 };
@@ -41,6 +63,8 @@ public:
 	void reverseTree();
 	void print();
 	void setValue(int val);
+	void setLRstring(string s);
+	void setPartner(Node* p);
 	EmptyNode();
 	~EmptyNode();
 };
@@ -67,7 +91,7 @@ void TreeNode::createTree(int level) {
 	}
 	//Otherwise, create two nodes for your left and right. Assign them the correct numbers.
 	//(which I still need to do, leftVal and rightVal are placeholders for now)
-	//Call createNode() on them with one lower level
+	//Call createNode(level - 1) on them
 	//because we just created this level
 	else {
 		int leftVal = 0;
@@ -75,10 +99,17 @@ void TreeNode::createTree(int level) {
 
 		left = new TreeNode();
 		left->setValue(value + leftVal);
-		left->createTree(level - 1);
+		left->setLRstring("L");
 
 		right = new TreeNode();
 		right->setValue(value + rightVal);
+		right->setLRstring("R");
+
+		//set partners when they are created
+		left->setPartner(right);
+		right->setPartner(left);
+
+		left->createTree(level - 1);
 		right->createTree(level - 1);
 	}
 }
@@ -95,6 +126,16 @@ void TreeNode::reverseTree() {
 //mutator for value
 void TreeNode::setValue(int val) {
 	value = val;
+}
+
+//mutator for lr
+void TreeNode::setLRstring(string s) {
+	lr = s;
+}
+
+//mutator for partner
+void TreeNode::setPartner(Node* p) {
+	partner = p;
 }
 
 //output your value, then your left node's value, then your right node's value
@@ -133,10 +174,16 @@ void EmptyNode::print() {
 }
 
 void EmptyNode::setValue(int val) {
-
+	return;
 }
 
+void EmptyNode::setLRstring(string s) {
+	return;
+}
 
+void EmptyNode::setPartner(Node* p) {
+	return;
+}
 
 //MAIN/////////////////////////////////////////////////////
 int main()
