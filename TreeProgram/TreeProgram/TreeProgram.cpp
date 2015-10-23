@@ -110,9 +110,14 @@ void EmptyNode::print() {
 int main()
 {
 	Node* n = (Node*) new TreeNode();
-	n->createTree(4);
-	n->print();
+	cout << "How many levels for this tree?";
+	int levels = 0;
 	string input;
+	cin >> input;
+	levels = atoi(input.c_str());
+	n->createTree(levels);
+	n->print();
+	cout << "\n" << "Press any key, then enter to quit";
 	cin >> input;
     return 0;
 }
